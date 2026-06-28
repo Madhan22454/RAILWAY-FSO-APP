@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Railway FSO Portal — Admin & Officer Login</title>
+  <meta name="description" content="Railway Food Safety Officer Monthly Return Portal — FSSAI, Food Safety and Standards Act 2006" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- =============================================
+     LANDING — PORTAL SELECTION
+============================================= -->
+<div id="landing-screen">
+  <div class="landing-bg-overlay"></div>
+  <div class="landing-content">
+    <div class="landing-header">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India" width="72" />
+      <h1>Food Safety and Standards Authority of India</h1>
+      <h2>Railway Division — Monthly Return Portal</h2>
+      <p>FSS Act, 2006 &nbsp;|&nbsp; Authorized Personnel Only</p>
+    </div>
+    <div class="portal-cards">
+      <div class="portal-card" onclick="showPortal('admin')">
+        <div class="portal-icon">🛡️</div>
+        <h3>Admin Portal</h3>
+        <p>Division Supervisors & Analytics</p>
+        <span class="portal-btn">Login as Admin →</span>
+      </div>
+      <div class="portal-card" onclick="showPortal('fso')">
+        <div class="portal-icon">📋</div>
+        <h3>FSO Portal</h3>
+        <p>Food Safety Officers — File Returns</p>
+        <span class="portal-btn">Login as Officer →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     ADMIN LOGIN
+============================================= -->
+<div id="admin-login-screen" style="display:none;">
+  <div class="auth-bg admin-bg">
+    <div class="auth-card">
+      <button class="back-btn" onclick="showLanding()">← Back</button>
+      <div class="auth-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" width="55" alt="Emblem" />
+        <h2>Admin Login</h2>
+        <p>Railway FSO Analytics Portal</p>
+      </div>
+      <div class="input-group">
+        <label>Admin Email</label>
+        <input type="email" id="admin-email" placeholder="admin@railways.gov.in" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="admin-password" placeholder="Enter admin password" />
+      </div>
+      <div id="admin-login-error" class="error-msg"></div>
+      <button class="btn btn-admin btn-full" onclick="doLogin('admin')">🔐 Secure Admin Login</button>
+      <div class="auth-footer">FSSAI Authorized — Administrators Only</div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     FSO LOGIN
+============================================= -->
+<div id="fso-login-screen" style="display:none;">
+  <div class="auth-bg fso-bg">
+    <div class="auth-card">
+      <button class="back-btn" onclick="showLanding()">← Back</button>
+      <div class="auth-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" width="55" alt="Emblem" />
+        <h2>Officer Login</h2>
+        <p>Railway Food Safety Officer Portal</p>
+      </div>
+      <div class="input-group">
+        <label>Officer Email</label>
+        <input type="email" id="fso-email" placeholder="officer@railways.gov.in" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="fso-password" placeholder="Enter your password" />
+      </div>
+      <div id="fso-login-error" class="error-msg"></div>
+      <button class="btn btn-fso btn-full" onclick="doLogin('fso')">🔐 Secure Officer Login</button>
+      <div class="auth-footer">FSSAI Authorized — FSO Personnel Only</div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     ADMIN DASHBOARD
+============================================= -->
+<div id="admin-dashboard" style="display:none;">
+  <header class="topbar admin-topbar">
+    <div class="topbar-brand">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Govt" width="38" />
+      <div>
+        <div class="title">Admin Analytics Dashboard</div>
+        <div class="subtitle">Railway FSO Monthly Return Portal — FSSAI</div>
+      </div>
+    </div>
+    <div class="topbar-user">
+      <span id="admin-user-info" class="user-chip">👤 Admin</span>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">⏻ Logout</button>
+    </div>
+  </header>
+  <div class="app-layout">
+    <aside class="sidebar admin-sidebar">
+      <ul class="nav-menu">
+        <li class="nav-heading">ANALYTICS</li>
+        <li class="nav-item active" id="nav-admin-dashboard" onclick="adminNav('admin-dashboard-view')">📊 Dashboard</li>
+        <li class="nav-item" id="nav-admin-reports" onclick="adminNav('admin-reports-view')">📁 All Submissions</li>
+        <li class="nav-item" id="nav-admin-monthly" onclick="adminNav('admin-monthly-view')">📅 Monthly Report</li>
+        <li class="nav-item" id="nav-admin-yearly" onclick="adminNav('admin-yearly-view')">📆 Yearly Report</li>
+        <li class="nav-heading">MANAGEMENT</li>
+        <li class="nav-item" id="nav-admin-users" onclick="adminNav('admin-users-view')">👥 Manage Users</li>
+      </ul>
+    </aside>
+    <main class="content-area">
+
+      <!-- VIEW: Admin Dashboard -->
+      <div id="admin-dashboard-view" class="view active">
+        <div class="page-header">
+          <h2>📊 Analytics Dashboard</h2>
+          <p>Overview of all FSO monthly return submissions across railway divisions.</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats-grid" id="admin-stats-grid">
+          <div class="stat-card blue-card">
+            <div class="stat-icon">📄</div>
+            <div class="stat-value" id="stat-total-reports">—</div>
+            <div class="stat-label">Total Submissions</div>
+          </div>
+          <div class="stat-card green-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value" id="stat-submitted">—</div>
+            <div class="stat-label">Submitted Returns</div>
+          </div>
+          <div class="stat-card orange-card">
+            <div class="stat-icon">📝</div>
+            <div class="stat-value" id="stat-drafts">—</div>
+            <div class="stat-label">Pending Drafts</div>
+          </div>
+          <div class="stat-card red-card">
+            <div class="stat-icon">🔬</div>
+            <div class="stat-value" id="stat-samples">—</div>
+            <div class="stat-label">Total Samples Sent</div>
+          </div>
+          <div class="stat-card purple-card">
+            <div class="stat-icon">🔍</div>
+            <div class="stat-value" id="stat-inspections">—</div>
+            <div class="stat-label">Total Inspections</div>
+          </div>
+          <div class="stat-card teal-card">
+            <div class="stat-icon">⚖️</div>
+            <div class="stat-value" id="stat-cases">—</div>
+            <div class="stat-label">Cases Filed</div>
+          </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <h4>📈 Inspections by Month (Current Year)</h4>
+            <canvas id="chart-inspections-monthly"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>🥧 Submission Status Distribution</h4>
+            <canvas id="chart-status-pie"></canvas>
+          </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <h4>🔬 Samples Sent vs Analysed (by Month)</h4>
+            <canvas id="chart-samples"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>⚖️ Adjudication Cases by Division</h4>
+            <canvas id="chart-adjudication"></canvas>
+          </div>
+        </div>
+
+        <!-- Recent Submissions -->
+        <div class="table-card" style="margin-top:20px;">
+          <div class="table-card-header">
+            <h4>🕐 Recent Submissions</h4>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>FSO Name</th><th>Division</th><th>Month</th><th>Year</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="admin-recent-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW: All Submissions -->
+      <div id="admin-reports-view" class="view" style="display:none;">
+        <div class="page-header">
+          <h2>📁 All FSO Submissions</h2>
+          <p>Search and filter all submitted monthly returns.</p>
+        </div>
+        <div class="filter-bar">
+          <div class="input-group filter-input">
+            <label>Filter by Month</label>
+            <select id="filter-month">
+              <option value="">All Months</option>
+              <option>January</option><option>February</option><option>March</option>
+              <option>April</option><option>May</option><option>June</option>
+              <option>July</option><option>August</option><option>September</option>
+              <option>October</option><option>November</option><option>December</option>
+            </select>
+          </div>
+          <div class="input-group filter-input">
+            <label>Filter by Year</label>
+            <input type="number" id="filter-year" placeholder="e.g. 2026" style="width:120px;" />
+          </div>
+          <div class="input-group filter-input">
+            <label>Filter by Status</label>
+            <select id="filter-status">
+              <option value="">All</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Draft">Draft</option>
+            </select>
+          </div>
+          <button class="btn btn-admin" onclick="loadAllReports()">🔎 Search</button>
+        </div>
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>FSO Name</th><th>Division</th><th>Month</th><th>Year</th><th>Status</th><th>Filed On</th><th>Actions</th></tr></thead>
+            <tbody id="all-reports-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW: Monthly Report -->
+      <div id="admin-monthly-view" class="view" style="display:none;">
+        <div class="page-header">
+          <h2>📅 Monthly Report Analysis</h2>
+          <p>Consolidated data for a specific month across all divisions.</p>
+        </div>
+        <div class="filter-bar">
+          <div class="input-group filter-input">
+            <label>Select Month</label>
+            <select id="monthly-month">
+              <option>January</option><option>February</option><option>March</option>
+              <option>April</option><option>May</option><option>June</option>
+              <option selected>July</option><option>August</option><option>September</option>
+              <option>October</option><option>November</option><option>December</option>
+            </select>
+          </div>
+          <div class="input-group filter-input">
+            <label>Select Year</label>
+            <input type="number" id="monthly-year" value="2026" style="width:120px;" />
+          </div>
+          <button class="btn btn-admin" onclick="loadMonthlyReport()">📊 Generate Report</button>
+        </div>
+        <div id="monthly-report-content"></div>
+      </div>
+
+      <!-- VIEW: Yearly Report -->
+      <div id="admin-yearly-view" class="view" style="display:none;">
+        <div class="page-header">
+          <h2>📆 Yearly Report Analysis</h2>
+          <p>Full-year performance overview across all FSO divisions.</p>
+        </div>
+        <div class="filter-bar">
+          <div class="input-group filter-input">
+            <label>Select Year</label>
+            <input type="number" id="yearly-year" value="2026" style="width:120px;" />
+          </div>
+          <button class="btn btn-admin" onclick="loadYearlyReport()">📊 Generate Yearly Report</button>
+        </div>
+        <div id="yearly-report-content"></div>
+      </div>
+
+      <!-- VIEW: Manage Users -->
+      <div id="admin-users-view" class="view" style="display:none;">
+        <div class="page-header">
+          <h2>👥 Manage Users</h2>
+          <p>Create and manage FSO officer accounts.</p>
+        </div>
+        <div class="form-card" style="margin-bottom:20px;">
+          <h3 class="section-title">Create New User Account</h3>
+          <div class="form-grid">
+            <div class="input-group"><label>Full Name</label><input type="text" id="new-user-name" placeholder="Full Name" /></div>
+            <div class="input-group"><label>Email</label><input type="email" id="new-user-email" placeholder="user@railways.gov.in" /></div>
+            <div class="input-group"><label>Password</label><input type="password" id="new-user-password" placeholder="Set password" /></div>
+            <div class="input-group">
+              <label>Role</label>
+              <select id="new-user-role">
+                <option value="fso">🟢 Food Safety Officer (FSO)</option>
+                <option value="admin">🛡️ Administrator (Admin)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:15px;">
+            <button class="btn btn-admin" onclick="createUser()">➕ Create Account</button>
+          </div>
+          <div id="create-user-msg" class="error-msg" style="margin-top:10px;"></div>
+        </div>
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW: Report Detail Modal Inline -->
+      <div id="admin-detail-view" class="view" style="display:none;">
+        <div class="page-header">
+          <div style="display:flex;align-items:center;gap:15px;">
+            <button class="btn btn-outline btn-sm" onclick="adminNav('admin-reports-view')">← Back to Submissions</button>
+            <div>
+              <h2>📄 Submission Details</h2>
+              <p>Full view of the FSO Monthly Return</p>
+            </div>
+          </div>
+        </div>
+        <div id="report-detail-content"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- =============================================
+     FSO DASHBOARD
+============================================= -->
+<div id="fso-dashboard" style="display:none;">
+  <header class="topbar fso-topbar">
+    <div class="topbar-brand">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Govt" width="38" />
+      <div>
+        <div class="title">Food Safety Officer Portal</div>
+        <div class="subtitle">Railway Division — Monthly Return Filing — FSS Act 2006</div>
+      </div>
+    </div>
+    <div class="topbar-user">
+      <span id="fso-user-info" class="user-chip">👤 Officer</span>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">⏻ Logout</button>
+    </div>
+  </header>
+  <div class="app-layout">
+    <aside class="sidebar fso-sidebar">
+      <ul class="nav-menu">
+        <li class="nav-heading">MY WORK</li>
+        <li class="nav-item active" id="nav-fso-new" onclick="fsoNav('fso-new-view')">📝 File New Return</li>
+        <li class="nav-item" id="nav-fso-my" onclick="fsoNav('fso-my-view')">📁 My Submissions</li>
+      </ul>
+    </aside>
+    <main class="content-area">
+
+      <!-- VIEW: FSO New Report -->
+      <div id="fso-new-view" class="view active">
+        <div class="page-header">
+          <h2>📝 Monthly Return Form</h2>
+          <p>Fill out all mandatory fields. Questions shown in <strong>bold</strong> are fixed as per FSS Act norms.</p>
+        </div>
+        <div class="form-card">
+          <div class="form-section">
+            <h3>Report Header</h3>
+            <div class="form-grid">
+              <div class="input-group">
+                <label>Reporting Month <span class="req">*</span></label>
+                <select id="r-month">
+                  <option value="">— Select Month —</option>
+                  <option>January</option><option>February</option><option>March</option>
+                  <option>April</option><option>May</option><option>June</option>
+                  <option>July</option><option>August</option><option>September</option>
+                  <option>October</option><option>November</option><option>December</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Year <span class="req">*</span></label>
+                <input type="number" id="r-year" value="2026" />
+              </div>
+              <div class="input-group">
+                <label>Railway Division <span class="req">*</span></label>
+                <input type="text" id="r-division" placeholder="e.g., Chennai Division" />
+              </div>
+              <div class="input-group">
+                <label>FSO Name <span class="req">*</span></label>
+                <input type="text" id="r-fsoname" placeholder="Full Name of the Officer" />
+              </div>
+            </div>
+          </div>
+          <div id="fixed-questions"></div>
+          <div id="annexures-container"></div>
+          <div class="form-actions">
+            <button class="btn btn-secondary" onclick="fsoSaveReport('Draft')">💾 Save as Draft</button>
+            <button class="btn btn-fso" onclick="fsoSaveReport('Submitted')">✅ Final Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: FSO My Submissions -->
+      <div id="fso-my-view" class="view" style="display:none;">
+        <div class="page-header">
+          <h2>📁 My Submissions</h2>
+          <p>View your draft and submitted monthly returns.</p>
+        </div>
+        <div class="table-card">
+          <table class="data-table">
+            <thead><tr><th>Month</th><th>Year</th><th>Division</th><th>Status</th><th>Filed On</th><th>Actions</th></tr></thead>
+            <tbody id="fso-reports-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

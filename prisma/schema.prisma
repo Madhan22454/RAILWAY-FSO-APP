@@ -1,0 +1,285 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id       Int             @id @default(autoincrement())
+  email    String          @unique
+  password String
+  name     String
+  role     String          // "admin" or "fso"
+  reports  MonthlyReport[]
+}
+
+model MonthlyReport {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  status      String   @default("Draft") // "Draft" or "Submitted"
+  
+  // Header Fields
+  month       String
+  year        String
+  division    String
+  fsoName     String
+
+  // FK to User
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+
+  // 1. Total No. of FBO in the Division
+  q1_totalFbo    Int?
+  q1_regCert     Int?
+  q1_licences    Int?
+
+  // 2. Total Number of Inspections Done
+  q2_staticUnits Int?
+  q2_mobileUnits Int?
+
+  // 3. Number of Food Samples Sent for Analysis
+  q3_samplesSent Int?
+
+  // 4. Number of Food Samples Analysed
+  q4_conform     Int?
+  q4_unsafe      Int?
+  q4_substandard Int?
+  q4_misbranded  Int?
+
+  // 5. Number of Meetings Attended
+  q5_meetings    Int?
+
+  // 6. Number of FBO Trainings / IEC Activities
+  q6_trainings   Int?
+
+  // 7. Adjudication
+  q7_casesFiled   Int?
+  q7_casesDecided Int?
+  q7_casesPending Int?
+
+  // 8. Convictions and Penalties against FBO
+  q8_convictions String?
+
+  // 9. Amount Realized
+  q9_amountRealized Float?
+
+  // 10. Prosecution Cases Launched
+  q10_prosecutionsLaunched Int?
+
+  // 11. Prosecution Cases Pending
+  q11_prosecutionsPending Int?
+
+  // 12. Punishments Awarded
+  q12_punishments String?
+
+  // 13. Eat Right Stations & Campus
+  q13_eatRightStations Int?
+  q13_eatRightCampus   Int?
+
+  // 14. Pending Action on Unsatisfactory Samples
+  q14_pendingActionUnsatisfactory String?
+
+  // 15. Courts Attended
+  q15_courtsAttended Int?
+
+  // 16. Food Safety Incidents/Public Complaints Attended
+  q16_incidentsComplaints Int?
+
+  // Relationships to Annexures
+  annex2  AnnexII[]
+  annex3  AnnexIII[]
+  annex4  AnnexIV[]
+  annex5  AnnexV[]
+  annex6  AnnexVI[]
+  annex7A AnnexVIIA[]
+  annex7B AnnexVIIB[]
+  annex7C AnnexVIIC[]
+  annex8  AnnexVIII[]
+  annex9A AnnexIXA[]
+  annex9B AnnexIXB[]
+  annex10 AnnexX[]
+  annex11 AnnexXI[]
+  annex12 AnnexXII[]
+  annex13 AnnexXIII[]
+  annex14 AnnexXIV[]
+}
+
+// --------------------------------------------------
+// ANNEXURES
+// --------------------------------------------------
+
+model AnnexII {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  date            String?
+  stationTrain    String?
+  unitsInspected  Int?
+}
+
+model AnnexIII {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  sampleNumber    String?
+  collectionDate  String?
+  place           String?
+  fboName         String?
+  fssaiLicense    String?
+  foodArticle     String?
+  quantity        String?
+  remarks         String?
+}
+
+model AnnexIV {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  sampleNumber    String?
+  collectionDate  String?
+  place           String?
+  fboName         String?
+  fssaiLicense    String?
+  foodArticle     String?
+  result          String?
+}
+
+model AnnexV {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  date            String?
+  station         String?
+  purpose         String?
+}
+
+model AnnexVI {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  date            String?
+  station         String?
+  trainNumber     String?
+  numberAttended  Int?
+}
+
+model AnnexVIIA {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  col1 String?
+  col2 String?
+  col3 String?
+  col4 String?
+  col5 String?
+}
+
+model AnnexVIIB {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  col1 String?
+  col2 String?
+  col3 String?
+  col4 String?
+  col5 String?
+}
+
+model AnnexVIIC {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  col1 String?
+  col2 String?
+  col3 String?
+  col4 String?
+  col5 String?
+}
+
+model AnnexVIII {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  col1 String?
+  col2 String?
+  col3 String?
+  col4 String?
+  col5 String?
+}
+
+model AnnexIXA {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  col1 String?
+  col2 String?
+  col3 String?
+  col4 String?
+  col5 String?
+}
+
+model AnnexIXB {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  col1 String?
+  col2 String?
+  col3 String?
+  col4 String?
+  col5 String?
+}
+
+model AnnexX {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  col1 String?
+  col2 String?
+  col3 String?
+  col4 String?
+  col5 String?
+}
+
+model AnnexXI {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  station         String?
+  campus          String?
+  remarks         String?
+}
+
+model AnnexXII {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  col1 String?
+  col2 String?
+  col3 String?
+  col4 String?
+  col5 String?
+}
+
+model AnnexXIII {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  date            String?
+  court           String?
+  purpose         String?
+  remarks         String?
+}
+
+model AnnexXIV {
+  id              Int           @id @default(autoincrement())
+  reportId        Int
+  report          MonthlyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  date            String?
+  complaint       String?
+  actionTaken     String?
+  status          String?
+}
