@@ -160,12 +160,8 @@
       <div class="nav-item" id="nav-yearly" onclick="showView('yearly')">
         <span class="nav-icon">📆</span><span>Yearly Report</span>
       </div>
-      <div class="nav-section">Settings</div>
       <div class="nav-item" id="nav-users" onclick="showView('users')">
         <span class="nav-icon">👥</span><span>User Management</span>
-      </div>
-      <div class="nav-item" id="nav-builder" onclick="showView('builder')">
-        <span class="nav-icon">⚙️</span><span>Form Builder</span>
       </div>
     </div>
 
@@ -363,40 +359,6 @@
       </div>
     </div>
 
-    <!-- ── VIEW: FORM BUILDER ── -->
-    <div class="view" id="view-builder">
-      <div class="page-header">
-        <h1>⚙️ Form Builder</h1>
-        <p>Add, edit, or remove questions from the monthly return form. Changes apply instantly for FSOs.</p>
-      </div>
-
-      <div class="builder-list" id="builder-list"></div>
-
-      <!-- Add New Question -->
-      <div class="add-question-form">
-        <h3>➕ Add New Question</h3>
-        <div class="form-row">
-          <div class="form-group" style="flex:3;">
-            <label>Question Text</label>
-            <input type="text" id="new-q-label" placeholder="e.g. Number of seizures made this month" />
-          </div>
-          <div class="form-group">
-            <label>Answer Type</label>
-            <select id="new-q-type">
-              <option value="text">Text (Short)</option>
-              <option value="textarea">Text (Long / Remarks)</option>
-              <option value="file">File Upload</option>
-            </select>
-          </div>
-        </div>
-        <div class="checkbox-row" style="margin-top:10px;">
-          <input type="checkbox" id="new-q-bold" checked />
-          <label for="new-q-bold">Display question in <strong>Bold</strong></label>
-        </div>
-        <div style="margin-top:16px;">
-          <button class="btn btn-primary" onclick="addQuestion()">➕ Add Question</button>
-        </div>
-      </div>
     </div>
 
   </main>

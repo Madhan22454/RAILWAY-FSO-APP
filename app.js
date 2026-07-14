@@ -3,6 +3,107 @@
 // Core application logic: Auth, Routing, Form, Charts, Reports
 // ============================================================
 
+// ── Fixed Questions & Subfields ─────────────────────────────
+const questions = [
+  {
+    id: "q1", label: "1. Total No. of FBO in the Division",
+    subfields: [
+      { id: "q1_totalFbo", label: "Total FBO", type: "number" },
+      { id: "q1_regCert",  label: "Registration Certificates", type: "number" },
+      { id: "q1_licences", label: "Licences", type: "number" }
+    ]
+  },
+  {
+    id: "q2", label: "2. Total Number of Inspections Done",
+    subfields: [
+      { id: "q2_staticUnits", label: "Static Units", type: "number" },
+      { id: "q2_mobileUnits", label: "Mobile Units", type: "number" }
+    ]
+  },
+  { id: "q3", label: "3. Number of Food Samples Sent for Analysis",
+    subfields: [{ id: "q3_samplesSent", label: "Samples Sent", type: "number" }] },
+  {
+    id: "q4", label: "4. Number of Food Samples Analysed (Result Received)",
+    subfields: [
+      { id: "q4_conform",     label: "Conform to Standard", type: "number" },
+      { id: "q4_unsafe",      label: "Unsafe", type: "number" },
+      { id: "q4_substandard", label: "Substandard", type: "number" },
+      { id: "q4_misbranded",  label: "Misbranded", type: "number" }
+    ]
+  },
+  { id: "q5", label: "5. Number of Meetings Attended",
+    subfields: [{ id: "q5_meetings", label: "Meetings", type: "number" }] },
+  { id: "q6", label: "6. Number of FBO Trainings / IEC Activities",
+    subfields: [{ id: "q6_trainings", label: "Trainings / IEC", type: "number" }] },
+  {
+    id: "q7", label: "7. Adjudication",
+    subfields: [
+      { id: "q7_casesFiled",   label: "Cases Filed before AO", type: "number" },
+      { id: "q7_casesDecided", label: "Cases Disposed", type: "number" },
+      { id: "q7_casesPending", label: "Cases Pending", type: "number" }
+    ]
+  },
+  { id: "q8", label: "8. Convictions and Penalties against FBO",
+    subfields: [{ id: "q8_convictions", label: "Details", type: "text" }] },
+  { id: "q9", label: "9. Amount Realized",
+    subfields: [{ id: "q9_amountRealized", label: "Amount (Rs.)", type: "number" }] },
+  { id: "q10", label: "10. Prosecution Cases Launched",
+    subfields: [{ id: "q10_prosecutionsLaunched", label: "Cases Launched", type: "number" }] },
+  { id: "q11", label: "11. Prosecution Cases Pending",
+    subfields: [{ id: "q11_prosecutionsPending", label: "Cases Pending", type: "number" }] },
+  { id: "q12", label: "12. Punishments Awarded",
+    subfields: [{ id: "q12_punishments", label: "Details", type: "text" }] },
+  {
+    id: "q13", label: "13. Eat Right Stations & Campus",
+    subfields: [
+      { id: "q13_eatRightStations", label: "Eat Right Stations", type: "number" },
+      { id: "q13_eatRightCampus",   label: "Eat Right Campus", type: "number" }
+    ]
+  },
+  { id: "q14", label: "14. Pending Action on Unsatisfactory Samples",
+    subfields: [{ id: "q14_pendingActionUnsatisfactory", label: "Details", type: "text" }] },
+  { id: "q15", label: "15. Courts Attended",
+    subfields: [{ id: "q15_courtsAttended", label: "Number of Courts", type: "number" }] },
+  { id: "q16", label: "16. Food Safety Incidents / Public Complaints Attended",
+    subfields: [{ id: "q16_incidentsComplaints", label: "Incidents / Complaints", type: "number" }] }
+];
+
+// ── Annexures — 14 Dynamic Tables ───────────────────────────
+const annexures = [
+  { id: "annex2", title: "ANNEX II — Inspection Details",
+    cols: [{ key: "date", label: "Date", type: "date" }, { key: "stationTrain", label: "Station / Train / Section", type: "text" }, { key: "unitsInspected", label: "Units Inspected", type: "number" }] },
+  { id: "annex3", title: "ANNEX III — Food Samples Sent for Analysis",
+    cols: [{ key: "sampleNumber", label: "Sample No.", type: "text" }, { key: "collectionDate", label: "Collection Date", type: "date" }, { key: "place", label: "Place", type: "text" }, { key: "fboName", label: "FBO Name", type: "text" }, { key: "fssaiLicense", label: "FSSAI Licence", type: "text" }, { key: "foodArticle", label: "Food Article", type: "text" }, { key: "quantity", label: "Quantity", type: "text" }, { key: "remarks", label: "Remarks", type: "text" }] },
+  { id: "annex4", title: "ANNEX IV — Food Sample Reports Received",
+    cols: [{ key: "sampleNumber", label: "Sample No.", type: "text" }, { key: "collectionDate", label: "Collection Date", type: "date" }, { key: "place", label: "Place", type: "text" }, { key: "fboName", label: "FBO Name", type: "text" }, { key: "fssaiLicense", label: "FSSAI Licence", type: "text" }, { key: "foodArticle", label: "Food Article", type: "text" }, { key: "result", label: "Result", type: "text" }] },
+  { id: "annex5", title: "ANNEX V — Meeting Details",
+    cols: [{ key: "date", label: "Date", type: "date" }, { key: "station", label: "Station", type: "text" }, { key: "purpose", label: "Purpose", type: "text" }] },
+  { id: "annex6", title: "ANNEX VI — Training / IEC Activities",
+    cols: [{ key: "date", label: "Date", type: "date" }, { key: "station", label: "Station", type: "text" }, { key: "trainNumber", label: "Train Number", type: "text" }, { key: "numberAttended", label: "No. Attended", type: "number" }] },
+  { id: "annex7A", title: "ANNEX VII A — Adjudication Filed",
+    cols: [{ key: "col1", label: "Date of Filing", type: "date" }, { key: "col2", label: "FBO Name", type: "text" }, { key: "col3", label: "Case No.", type: "text" }, { key: "col4", label: "Nature of Violation", type: "text" }, { key: "col5", label: "Remarks", type: "text" }] },
+  { id: "annex7B", title: "ANNEX VII B — Adjudication Decided",
+    cols: [{ key: "col1", label: "Case No.", type: "text" }, { key: "col2", label: "FBO Name", type: "text" }, { key: "col3", label: "Date of Order", type: "date" }, { key: "col4", label: "Decision", type: "text" }, { key: "col5", label: "Penalty (Rs.)", type: "number" }] },
+  { id: "annex7C", title: "ANNEX VII C — Adjudication Pending",
+    cols: [{ key: "col1", label: "Case No.", type: "text" }, { key: "col2", label: "FBO Name", type: "text" }, { key: "col3", label: "Date of Filing", type: "date" }, { key: "col4", label: "Reason for Pending", type: "text" }, { key: "col5", label: "Remarks", type: "text" }] },
+  { id: "annex8", title: "ANNEX VIII — Conviction and Penalty",
+    cols: [{ key: "col1", label: "Case No.", type: "text" }, { key: "col2", label: "FBO Name", type: "text" }, { key: "col3", label: "Date of Conviction", type: "date" }, { key: "col4", label: "Nature of Offence", type: "text" }, { key: "col5", label: "Penalty (Rs.)", type: "number" }] },
+  { id: "annex9A", title: "ANNEX IX A — Prosecution Cases Filed",
+    cols: [{ key: "col1", label: "Sample No.", type: "text" }, { key: "col2", label: "FBO Name", type: "text" }, { key: "col3", label: "Court Name", type: "text" }, { key: "col4", label: "Date of Filing", type: "date" }, { key: "col5", label: "Remarks", type: "text" }] },
+  { id: "annex9B", title: "ANNEX IX B — Pending Prosecution Cases",
+    cols: [{ key: "col1", label: "Case No.", type: "text" }, { key: "col2", label: "FBO Name", type: "text" }, { key: "col3", label: "Court Name", type: "text" }, { key: "col4", label: "Status", type: "text" }, { key: "col5", label: "Next Hearing", type: "date" }] },
+  { id: "annex10", title: "ANNEX X — Punishment Awarded",
+    cols: [{ key: "col1", label: "Case No.", type: "text" }, { key: "col2", label: "FBO Name", type: "text" }, { key: "col3", label: "Date of Judgment", type: "date" }, { key: "col4", label: "Punishment Details", type: "text" }, { key: "col5", label: "Amount (Rs.)", type: "number" }] },
+  { id: "annex11", title: "ANNEX XI — Eat Right Station and Campus",
+    cols: [{ key: "station", label: "Station Name", type: "text" }, { key: "campus", label: "Campus", type: "text" }, { key: "remarks", label: "Remarks", type: "text" }] },
+  { id: "annex12", title: "ANNEX XII — Pending Action on Unsatisfactory Samples",
+    cols: [{ key: "col1", label: "Sample No.", type: "text" }, { key: "col2", label: "FBO Name", type: "text" }, { key: "col3", label: "Result", type: "text" }, { key: "col4", label: "Action Taken", type: "text" }, { key: "col5", label: "Pending Reason", type: "text" }] },
+  { id: "annex13", title: "ANNEX XIII — Court Attendance",
+    cols: [{ key: "date", label: "Date", type: "date" }, { key: "court", label: "Court Name", type: "text" }, { key: "purpose", label: "Purpose", type: "text" }, { key: "remarks", label: "Remarks", type: "text" }] },
+  { id: "annex14", title: "ANNEX XIV — Public Complaints",
+    cols: [{ key: "date", label: "Date", type: "date" }, { key: "complaint", label: "Complaint", type: "text" }, { key: "actionTaken", label: "Action Taken", type: "text" }, { key: "status", label: "Status", type: "text" }] }
+];
+
 // ── State ──────────────────────────────────────────────────
 let STATE = {
   role: 'fso',           // 'fso' | 'admin'
@@ -10,8 +111,6 @@ let STATE = {
   loginTab: 'fso',
   currentView: 'form',
   submissions: [],
-  questions: [],
-  formFiles: {},         // { qId: [{ name, size, type, dataUrl }] }
   charts: {},            // chart instances
 };
 
@@ -28,6 +127,27 @@ function init() {
   populateMonthSelects();
   renderFormQuestions();
   updateBadge();
+  
+  // Expose methods globally for HTML actions
+  window.doLogin = doLogin;
+  window.doSignup = doSignup;
+  window.doResetPassword = doResetPassword;
+  window.doLogout = doLogout;
+  window.switchLoginTab = switchLoginTab;
+  window.showScreen = showScreen;
+  window.setRole = setRole;
+  window.showView = showView;
+  window.checkExistingSubmission = checkExistingSubmission;
+  window.submitForm = submitForm;
+  window.clearForm = clearForm;
+  window.addAnnexRow = addAnnexRow;
+  window.viewSubmission = viewSubmission;
+  window.deleteSubmission = deleteSubmission;
+  window.closeModal = closeModal;
+  window.closeModalDirect = closeModalDirect;
+  window.renderMonthlyReport = renderMonthlyReport;
+  window.renderYearlyReport = renderYearlyReport;
+  window.exportJSON = exportJSON;
 }
 
 // ── LocalStorage Persistence ───────────────────────────────
@@ -39,27 +159,19 @@ function loadData() {
     ALL_USERS = [
       { name: 'System Admin', email: 'admin@fss.com', password: 'admin123', role: 'admin', approved: true }
     ];
-    saveUsers();
+    localStorage.setItem('fss_users', JSON.stringify(ALL_USERS));
   }
 
   const subs = localStorage.getItem('fss_submissions');
-  const qs   = localStorage.getItem('fss_questions');
-
   if (subs) {
     STATE.submissions = JSON.parse(subs);
   } else {
     STATE.submissions = [...window.SEED_SUBMISSIONS];
     saveSubmissions();
   }
-  if (qs) {
-    STATE.questions = JSON.parse(qs);
-  } else {
-    STATE.questions = [...window.SEED_QUESTIONS];
-    saveQuestions();
-  }
 }
+
 function saveSubmissions() { localStorage.setItem('fss_submissions', JSON.stringify(STATE.submissions)); }
-function saveQuestions()   { localStorage.setItem('fss_questions',   JSON.stringify(STATE.questions));   }
 function saveUsers()       { localStorage.setItem('fss_users',       JSON.stringify(ALL_USERS));         }
 
 // ── Auth ───────────────────────────────────────────────────
@@ -106,7 +218,7 @@ function doLogin() {
     errEl.classList.add('show');
     return;
   }
-  if (!user.approved) {
+  if (!user.approved && user.role !== 'admin') {
     errEl.textContent = '⏳ Account pending admin approval.';
     errEl.classList.add('show');
     return;
@@ -144,13 +256,13 @@ function doSignup() {
 
   const newUser = {
     name, email, password: pass, role,
-    approved: false // Needs admin approval
+    approved: role === 'admin' ? true : false // FSOs need admin approval, admins approved instantly for testing
   };
   ALL_USERS.push(newUser);
   saveUsers();
   
   errEl.classList.remove('show');
-  alert('✨ Account created successfully! Please wait for Admin approval before logging in.');
+  alert(role === 'admin' ? '✨ Admin account created! Log in now.' : '✨ FSO account created! Please wait for Admin approval.');
   showScreen('login-screen');
 }
 
@@ -197,14 +309,6 @@ function applyRole() {
   document.getElementById('admin-nav').style.display = isAdmin ? 'block' : 'none';
   document.getElementById('role-switcher').style.display =
     STATE.currentUser?.role === 'admin' ? 'flex' : 'none';
-
-  if (isAdmin) {
-    document.getElementById('role-admin-btn').classList.add('active');
-    document.getElementById('role-fso-btn').classList.remove('active');
-  } else {
-    document.getElementById('role-fso-btn').classList.add('active');
-    document.getElementById('role-admin-btn').classList.remove('active');
-  }
 }
 
 function setRole(role) {
@@ -230,7 +334,6 @@ function showView(viewName) {
   if (viewName === 'dashboard')        renderDashboard();
   if (viewName === 'submissions')      renderSubmissionsTable();
   if (viewName === 'my-submissions')   renderMySubmissions();
-  if (viewName === 'builder')          renderBuilder();
   if (viewName === 'users')            renderUserManagement();
   if (viewName === 'monthly')          populateMonthlySelect();
   if (viewName === 'yearly')           renderYearlyReport();
@@ -267,6 +370,7 @@ function getLastNMonths(n) {
 }
 
 function monthLabel(monthStr) {
+  if (!monthStr || !monthStr.includes('-')) return monthStr;
   const [yr, mo] = monthStr.split('-');
   return `${MONTH_NAMES[+mo-1]} ${yr}`;
 }
@@ -275,122 +379,108 @@ function checkExistingSubmission() {
   const month = document.getElementById('form-month-select').value;
   const exists = STATE.submissions.find(s => s.month === month);
   const warn = document.getElementById('existing-warning');
-  warn.style.display = exists ? 'inline' : 'none';
+  if (warn) warn.style.display = exists ? 'inline' : 'none';
   if (exists) loadFormData(exists);
+  else clearForm();
 }
 
 // ── Form Questions Renderer ────────────────────────────────
 function renderFormQuestions() {
   const container = document.getElementById('form-questions');
   if (!container) return;
-  STATE.formFiles = {};
-  container.innerHTML = STATE.questions.map((q, i) => buildQuestionHTML(q, i)).join('');
-  // Attach file listeners
-  STATE.questions.forEach(q => {
-    if (q.type === 'file') {
-      const zone = document.getElementById(`zone-${q.id}`);
-      const inp  = document.getElementById(`file-${q.id}`);
-      if (zone && inp) {
-        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-        zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(q.id, e.dataTransfer.files); });
-        inp.addEventListener('change', () => handleFiles(q.id, inp.files));
-      }
-    }
+
+  let html = '<div style="margin-bottom:30px;"><h3 style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:15px;border-bottom:1px solid var(--border);padding-bottom:8px;">16 Fixed Questions</h3>';
+
+  // Render 16 questions
+  questions.forEach(q => {
+    html += `
+      <div class="fixed-q-box" style="background:var(--bg-secondary);border:1px solid var(--border);padding:16px 18px;border-radius:var(--radius-sm);margin-bottom:14px;">
+        <div class="fixed-q-title" style="font-weight:700;font-size:14px;color:var(--text-primary);margin-bottom:14px;">${q.label}</div>`;
+    q.subfields.forEach(sub => {
+      const type = sub.type || 'number';
+      html += `
+        <div class="subfield-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--border);">
+          <div class="subfield-label" style="font-size:13px;color:var(--text-secondary);flex:1;">${sub.label}</div>
+          <div class="subfield-input">
+            <input type="${type}" id="ans-${sub.id}" placeholder="${type==='number'?'0':'—'}" style="padding:8px 12px;background:var(--bg-primary);border:1px solid var(--border);border-radius:5px;color:var(--text-primary);font-size:13px;width:180px;outline:none;" />
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
   });
-}
 
-function buildQuestionHTML(q, i) {
-  const labelClass = q.bold ? 'question-label' : 'question-label' ;
-  const labelStyle = q.bold ? 'font-weight:800;' : 'font-weight:500;';
+  html += '</div>';
 
-  let inputHTML = '';
-  if (q.type === 'text') {
-    inputHTML = `<input class="form-input" id="ans-${q.id}" type="text" placeholder="Enter value..." />`;
-  } else if (q.type === 'textarea') {
-    inputHTML = `<textarea class="form-textarea" id="ans-${q.id}" placeholder="Enter your remarks here..."></textarea>`;
-  } else if (q.type === 'file') {
-    inputHTML = `
-      <div class="upload-zone" id="zone-${q.id}" onclick="document.getElementById('file-${q.id}').click()">
-        <div class="upload-icon">📎</div>
-        <p><strong>Click to browse</strong> or drag &amp; drop any file here</p>
-        <p style="font-size:11px;margin-top:4px;">Supports PDF, Excel, Word, Images, CSV — any format</p>
-        <input type="file" id="file-${q.id}" multiple />
-      </div>
-      <div class="file-list" id="file-list-${q.id}"></div>`;
-  }
+  // Render 14 Annexures
+  html += '<div style="margin-top:40px;"><h3 style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:15px;border-bottom:1px solid var(--border);padding-bottom:8px;">14 Annexures (Dynamic Tables)</h3>';
 
-  return `
-    <div class="form-question">
-      <div class="${labelClass}" style="${labelStyle}">
-        <span class="question-num">${i+1}</span>
-        <span>${q.label}</span>
-      </div>
-      ${inputHTML}
-    </div>`;
-}
-
-function handleFiles(qId, fileList) {
-  if (!STATE.formFiles[qId]) STATE.formFiles[qId] = [];
-  Array.from(fileList).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      STATE.formFiles[qId].push({ name: file.name, size: file.size, type: file.type, dataUrl: e.target.result });
-      renderFileList(qId);
-    };
-    reader.readAsDataURL(file);
+  annexures.forEach(annex => {
+    html += `
+      <div class="annexure-box" id="box-${annex.id}" style="margin-top:20px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-secondary);margin-bottom:20px;">
+        <div class="annexure-header" style="background:var(--bg-secondary);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">
+          <span class="annexure-title" style="font-weight:700;font-size:13px;color:var(--accent-blue);">${annex.title}</span>
+          <button class="btn btn-primary btn-sm" onclick="addAnnexRow('${annex.id}')" style="padding:6px 12px;font-size:12px;">+ Add Row</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="annex-table" style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:var(--bg-primary);">
+                ${annex.cols.map(c=>`<th style="font-size:11px;font-weight:700;text-transform:uppercase;padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border);text-align:left;">${c.label}</th>`).join('')}
+                <th style="font-size:11px;font-weight:700;text-transform:uppercase;padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border);text-align:left;width:50px;">Del</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-${annex.id}"></tbody>
+          </table>
+        </div>
+      </div>`;
   });
+
+  html += '</div>';
+  container.innerHTML = html;
 }
 
-function renderFileList(qId) {
-  const listEl = document.getElementById(`file-list-${qId}`);
-  if (!listEl) return;
-  const files = STATE.formFiles[qId] || [];
-  listEl.innerHTML = files.map((f, i) => `
-    <div class="file-item">
-      <span class="file-icon">${getFileIcon(f.type)}</span>
-      <div class="file-info">
-        <div class="file-name">${f.name}</div>
-        <div class="file-size">${formatSize(f.size)}</div>
-      </div>
-      <button class="file-remove" onclick="removeFile('${qId}',${i})">🗑️</button>
-    </div>`).join('');
-}
+function addAnnexRow(annexId, rowData = null) {
+  const annex = annexures.find(a => a.id === annexId);
+  const tbody = document.getElementById(`tbody-${annexId}`);
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid var(--border)';
 
-function removeFile(qId, idx) {
-  STATE.formFiles[qId].splice(idx, 1);
-  renderFileList(qId);
-}
+  let tds = annex.cols.map(c => {
+    const val = rowData ? (rowData[c.key] || '') : '';
+    return `<td style="padding:8px 10px;"><input type="${c.type}" class="annex-input" data-key="${c.key}" value="${val}" style="width:100%;padding:6px 8px;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-primary);font-size:12px;border-radius:4px;outline:none;" /></td>`;
+  }).join('');
 
-function getFileIcon(type) {
-  if (!type) return '📄';
-  if (type.includes('pdf'))   return '📕';
-  if (type.includes('image')) return '🖼️';
-  if (type.includes('excel') || type.includes('spreadsheet') || type.includes('csv')) return '📊';
-  if (type.includes('word') || type.includes('document')) return '📘';
-  if (type.includes('zip') || type.includes('rar')) return '📦';
-  return '📄';
-}
-
-function formatSize(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
-  return (bytes/1048576).toFixed(1) + ' MB';
+  tds += `<td style="padding:8px 10px;text-align:center;"><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()" style="padding:4px 8px;font-size:11px;">✕</button></td>`;
+  tr.innerHTML = tds;
+  tbody.appendChild(tr);
 }
 
 // ── Load Existing Data into Form ───────────────────────────
 function loadFormData(sub) {
-  STATE.questions.forEach(q => {
-    const ans = sub.answers[q.id];
-    if (!ans) return;
-    if (q.type === 'text' || q.type === 'textarea') {
-      const el = document.getElementById(`ans-${q.id}`);
-      if (el) el.value = ans.text || '';
-    } else if (q.type === 'file') {
-      STATE.formFiles[q.id] = ans.files || [];
-      renderFileList(q.id);
-    }
+  // Clear any existing annexure table rows
+  annexures.forEach(annex => {
+    const tbody = document.getElementById(`tbody-${annex.id}`);
+    if (tbody) tbody.innerHTML = '';
   });
+
+  // Load 16 questions
+  questions.forEach(q => {
+    q.subfields.forEach(subfield => {
+      const el = document.getElementById(`ans-${subfield.id}`);
+      if (el) el.value = sub.answers?.[subfield.id] || '';
+    });
+  });
+
+  // Load 14 annexures
+  if (sub.annexures) {
+    Object.keys(sub.annexures).forEach(annexId => {
+      const rows = sub.annexures[annexId] || [];
+      rows.forEach(rowData => {
+        addAnnexRow(annexId, rowData);
+      });
+    });
+  }
 }
 
 // ── Submit Form ────────────────────────────────────────────
@@ -400,13 +490,27 @@ function submitForm() {
   const designation = document.getElementById('form-designation').value || 'FSO';
 
   const answers = {};
-  STATE.questions.forEach(q => {
-    if (q.type === 'text' || q.type === 'textarea') {
-      const el = document.getElementById(`ans-${q.id}`);
-      answers[q.id] = { text: el ? el.value : '', files: [] };
-    } else if (q.type === 'file') {
-      answers[q.id] = { text: '', files: STATE.formFiles[q.id] || [] };
-    }
+  
+  // Save 16 questions
+  questions.forEach(q => {
+    q.subfields.forEach(sub => {
+      const el = document.getElementById(`ans-${sub.id}`);
+      answers[sub.id] = el ? el.value : '';
+    });
+  });
+
+  // Save 14 annexures
+  const annexData = {};
+  annexures.forEach(annex => {
+    const rows = document.querySelectorAll(`#tbody-${annex.id} tr`);
+    annexData[annex.id] = Array.from(rows).map(tr => {
+      const obj = {};
+      tr.querySelectorAll('.annex-input').forEach(inp => {
+        const key = inp.dataset.key;
+        obj[key] = inp.value;
+      });
+      return obj;
+    });
   });
 
   const sub = {
@@ -416,7 +520,8 @@ function submitForm() {
     submittedAt: new Date().toISOString(),
     district,
     designation,
-    answers
+    answers,
+    annexures: annexData
   };
 
   const existIdx = STATE.submissions.findIndex(s => s.month === month);
@@ -430,14 +535,18 @@ function submitForm() {
 }
 
 function clearForm() {
-  STATE.questions.forEach(q => {
-    if (q.type === 'text' || q.type === 'textarea') {
-      const el = document.getElementById(`ans-${q.id}`);
+  // Clear 16 questions
+  questions.forEach(q => {
+    q.subfields.forEach(subfield => {
+      const el = document.getElementById(`ans-${subfield.id}`);
       if (el) el.value = '';
-    } else if (q.type === 'file') {
-      STATE.formFiles[q.id] = [];
-      renderFileList(q.id);
-    }
+    });
+  });
+
+  // Clear 14 annexures
+  annexures.forEach(annex => {
+    const tbody = document.getElementById(`tbody-${annex.id}`);
+    if (tbody) tbody.innerHTML = '';
   });
 }
 
@@ -453,9 +562,9 @@ function renderMySubmissions() {
     <tr>
       <td><strong>${monthLabel(s.month)}</strong></td>
       <td>${s.district || '—'}</td>
-      <td>${s.answers.q1?.text || '—'}</td>
-      <td>${s.answers.q2?.text || '—'}</td>
-      <td>${s.answers.q3?.text || '—'}</td>
+      <td>${s.answers.q1_totalFbo || '—'}</td>
+      <td>${(+(s.answers.q2_staticUnits || 0)) + (+(s.answers.q2_mobileUnits || 0))}</td>
+      <td>${s.answers.q3_samplesSent || '—'}</td>
       <td>${formatDate(s.submittedAt)}</td>
       <td>
         <button class="btn btn-outline btn-sm" onclick="viewSubmission('${s.id}')">👁️ View</button>
@@ -480,15 +589,15 @@ function renderSubmissionsTable() {
   }
 
   tbody.innerHTML = subs.map(s => {
-    const unsafe = +(s.answers.q5?.text || 0);
+    const unsafe = +(s.answers.q4_unsafe || 0);
     return `
     <tr>
       <td><strong>${monthLabel(s.month)}</strong></td>
       <td>${s.submittedBy}</td>
       <td>${s.district || '—'}</td>
-      <td>${s.answers.q1?.text || '—'}</td>
-      <td>${s.answers.q2?.text || '—'}</td>
-      <td>${s.answers.q3?.text || '—'}</td>
+      <td>${s.answers.q1_totalFbo || '—'}</td>
+      <td>${(+(s.answers.q2_staticUnits || 0)) + (+(s.answers.q2_mobileUnits || 0))}</td>
+      <td>${s.answers.q3_samplesSent || '—'}</td>
       <td>${unsafe > 0 ? `<span class="badge badge-red">${unsafe}</span>` : `<span class="badge badge-green">0</span>`}</td>
       <td>${formatDate(s.submittedAt)}</td>
       <td style="display:flex;gap:6px;">
@@ -513,26 +622,48 @@ function viewSubmission(id) {
     </div>
     <hr style="border-color:var(--border);margin-bottom:18px;" />`;
 
-  STATE.questions.forEach((q, i) => {
-    const ans = sub.answers[q.id];
-    if (!ans) return;
+  // Render 16 questions
+  html += '<h3 style="font-size:14px;font-weight:700;color:var(--accent-blue);margin-bottom:10px;">16 Fixed Questions</h3>';
+  questions.forEach((q, i) => {
     html += `
       <div style="margin-bottom:14px;padding:12px;background:var(--bg-glass);border-radius:var(--radius-sm);border:1px solid var(--border);">
-        <div style="font-size:12px;font-weight:800;color:var(--text-primary);margin-bottom:6px;">${i+1}. ${q.label}</div>`;
-
-    if (q.type === 'file') {
-      if (ans.files && ans.files.length) {
-        html += `<div style="display:flex;flex-direction:column;gap:6px;">` +
-          ans.files.map(f => `<div class="file-item"><span class="file-icon">${getFileIcon(f.type)}</span>
-            <div class="file-info"><div class="file-name">${f.name}</div><div class="file-size">${formatSize(f.size)}</div></div></div>`).join('') +
-          `</div>`;
-      } else {
-        html += `<span style="color:var(--text-muted);font-size:13px;">No files uploaded</span>`;
-      }
-    } else {
-      html += `<div style="font-size:14px;color:var(--text-secondary);">${ans.text || '—'}</div>`;
-    }
+        <div style="font-size:12px;font-weight:800;color:var(--text-primary);margin-bottom:6px;">${q.label}</div>`;
+    q.subfields.forEach(subfield => {
+      html += `
+        <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px dashed rgba(255,255,255,0.05);">
+          <span style="color:var(--text-secondary);">${subfield.label}</span>
+          <span style="font-weight:700;color:var(--text-primary);">${sub.answers?.[subfield.id] || '—'}</span>
+        </div>`;
+    });
     html += `</div>`;
+  });
+
+  // Render 14 Annexures
+  html += '<h3 style="font-size:14px;font-weight:700;color:var(--accent-blue);margin-top:20px;margin-bottom:10px;">14 Annexure Tables</h3>';
+  annexures.forEach(annex => {
+    const rows = sub.annexures?.[annex.id] || [];
+    if (!rows.length) return;
+    
+    html += `
+      <div style="margin-bottom:14px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-glass);">
+        <div style="background:rgba(255,255,255,0.02);padding:8px 12px;font-weight:700;font-size:12px;color:var(--text-primary);border-bottom:1px solid var(--border);">${annex.title}</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead>
+              <tr style="background:rgba(0,0,0,0.2);">
+                ${annex.cols.map(c => `<th style="padding:6px 8px;color:var(--text-secondary);border-bottom:1px solid var(--border);text-align:left;">${c.label}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(row => `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.02);">
+                  ${annex.cols.map(c => `<td style="padding:6px 8px;color:var(--text-secondary);">${row[c.key] || '—'}</td>`).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
   });
 
   document.getElementById('modal-body').innerHTML = html;
@@ -558,12 +689,12 @@ function renderDashboard() {
   if (!subs.length) return;
 
   const latest = [...subs].sort((a,b) => b.month.localeCompare(a.month))[0];
-  const totalFBOs        = +(latest?.answers?.q1?.text || 0);
-  const totalInspections = subs.reduce((a,s) => a + +(s.answers.q2?.text||0), 0);
-  const totalSamples     = subs.reduce((a,s) => a + +(s.answers.q3?.text||0), 0);
-  const totalUnsafe      = subs.reduce((a,s) => a + +(s.answers.q5?.text||0), 0);
-  const totalSubs        = subs.reduce((a,s) => a + +(s.answers.q6?.text||0), 0);
-  const totalAdj         = subs.reduce((a,s) => a + +(s.answers.q10?.text||0), 0);
+  const totalFBOs        = +(latest?.answers?.q1_totalFbo || 0);
+  const totalInspections = subs.reduce((a,s) => a + +(s.answers.q2_staticUnits||0) + +(s.answers.q2_mobileUnits||0), 0);
+  const totalSamples     = subs.reduce((a,s) => a + +(s.answers.q3_samplesSent||0), 0);
+  const totalUnsafe      = subs.reduce((a,s) => a + +(s.answers.q4_unsafe||0), 0);
+  const totalSubs        = subs.reduce((a,s) => a + +(s.answers.q4_substandard||0), 0);
+  const totalAdj         = subs.reduce((a,s) => a + +(s.answers.q7_casesPending||0), 0);
   const safeRate         = totalSamples > 0 ? (((totalSamples - totalUnsafe - totalSubs) / totalSamples) * 100).toFixed(1) : 100;
 
   document.getElementById('dashboard-stats').innerHTML = `
@@ -598,105 +729,116 @@ function renderDashboard() {
       <div class="stat-sub">Total pending across all months</div>
     </div>
     <div class="stat-card purple">
-      <div class="stat-icon">📁</div>
+      <div class="stat-icon">📅</div>
       <div class="stat-label">Months on Record</div>
       <div class="stat-value">${subs.length}</div>
       <div class="stat-sub">Monthly returns filed</div>
     </div>`;
 
-  const sorted = [...subs].sort((a,b) => a.month.localeCompare(b.month)).slice(-12);
-  const labels = sorted.map(s => monthLabel(s.month).split(' ').map((w,i)=> i===0 ? w.slice(0,3):w).join(' '));
+  buildInspectionsChart(subs);
+  buildSamplesChart(subs);
+  buildAdjudicationChart(subs);
+  buildFboGrowthChart(subs);
+}
 
-  // Chart 1: Inspections
-  STATE.charts.inspections = new Chart(document.getElementById('chart-inspections'), {
+// ── Chart Builders ─────────────────────────────────────────
+function buildInspectionsChart(subs) {
+  const sorted = [...subs].sort((a,b) => a.month.localeCompare(b.month)).slice(-12);
+  const ctx = document.getElementById('chart-inspections')?.getContext('2d');
+  if (!ctx) return;
+  STATE.charts.inspections = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels,
+      labels: sorted.map(s => monthLabel(s.month)),
       datasets: [{
         label: 'Inspections',
-        data: sorted.map(s => +(s.answers.q2?.text||0)),
-        backgroundColor: 'rgba(99,179,237,0.7)',
-        borderColor: '#63b3ed',
-        borderWidth: 2,
-        borderRadius: 6,
+        data: sorted.map(s => (+(s.answers.q2_staticUnits||0)) + (+(s.answers.q2_mobileUnits||0))),
+        backgroundColor: '#3182ce',
+        borderRadius: 4
       }]
     },
-    options: chartOptions('Number of Inspections')
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a0aec0' } }, x: { ticks: { color: '#a0aec0' } } }
+    }
   });
+}
 
-  // Chart 2: Sample Results Stacked
-  STATE.charts.samples = new Chart(document.getElementById('chart-samples'), {
+function buildSamplesChart(subs) {
+  const sorted = [...subs].sort((a,b) => a.month.localeCompare(b.month)).slice(-12);
+  const ctx = document.getElementById('chart-samples')?.getContext('2d');
+  if (!ctx) return;
+  STATE.charts.samples = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels,
+      labels: sorted.map(s => monthLabel(s.month)),
       datasets: [
-        { label: 'Conform',    data: sorted.map(s=>+(s.answers.q7?.text||0)), backgroundColor:'rgba(104,211,145,0.8)', borderRadius:4 },
-        { label: 'Substandard',data: sorted.map(s=>+(s.answers.q6?.text||0)), backgroundColor:'rgba(246,173,85,0.8)', borderRadius:4 },
-        { label: 'Unsafe',     data: sorted.map(s=>+(s.answers.q5?.text||0)), backgroundColor:'rgba(252,129,129,0.8)', borderRadius:4 },
-        { label: 'Misbranded', data: sorted.map(s=>+(s.answers.q8?.text||0)), backgroundColor:'rgba(183,148,244,0.8)', borderRadius:4 },
+        { label: 'Conform', data: sorted.map(s => +(s.answers.q4_conform||0)), backgroundColor: '#48bb78' },
+        { label: 'Substandard', data: sorted.map(s => +(s.answers.q4_substandard||0)), backgroundColor: '#ecc94b' },
+        { label: 'Unsafe', data: sorted.map(s => +(s.answers.q4_unsafe||0)), backgroundColor: '#f56565' },
+        { label: 'Misbranded', data: sorted.map(s => +(s.answers.q4_misbranded||0)), backgroundColor: '#9f7aea' }
       ]
     },
-    options: { ...chartOptions('Samples'), plugins: { ...chartOptions('').plugins }, scales: { x: stackedAxis(), y: { ...stackedAxis(), stacked:true, ticks:{ color:'#94a3b8' } } } }
-  });
-
-  // Chart 3: Adjudication line
-  STATE.charts.adjudication = new Chart(document.getElementById('chart-adjudication'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label:'Pending Cases',  data: sorted.map(s=>+(s.answers.q10?.text||0)), borderColor:'#f6ad55', backgroundColor:'rgba(246,173,85,0.1)', fill:true, tension:0.4, pointRadius:4 },
-        { label:'Disposed Cases', data: sorted.map(s=>+(s.answers.q11?.text||0)), borderColor:'#68d391', backgroundColor:'rgba(104,211,145,0.1)', fill:true, tension:0.4, pointRadius:4 },
-      ]
-    },
-    options: chartOptions('Cases')
-  });
-
-  // Chart 4: FBO Growth
-  STATE.charts.fbos = new Chart(document.getElementById('chart-fbos'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label:'Registered FBOs',
-        data: sorted.map(s=>+(s.answers.q1?.text||0)),
-        borderColor:'#b794f4',
-        backgroundColor:'rgba(183,148,244,0.12)',
-        fill:true, tension:0.4, pointRadius:5,
-        pointBackgroundColor:'#b794f4'
-      }]
-    },
-    options: chartOptions('FBO Count')
-  });
-}
-
-function chartOptions(yLabel) {
-  return {
-    responsive: true,
-    plugins: {
-      legend: { labels: { color: '#94a3b8', font:{ size:11 } } },
-      tooltip: { backgroundColor:'#1e293b', titleColor:'#e2e8f0', bodyColor:'#94a3b8', borderColor:'rgba(255,255,255,0.08)', borderWidth:1 }
-    },
-    scales: {
-      x: { ticks:{ color:'#64748b', font:{size:11} }, grid:{ color:'rgba(255,255,255,0.04)' } },
-      y: { ticks:{ color:'#94a3b8', font:{size:11} }, grid:{ color:'rgba(255,255,255,0.05)' }, title:{ display:!!yLabel, text:yLabel, color:'#64748b', font:{size:11} } }
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0' } } },
+      scales: {
+        y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a0aec0' } },
+        x: { stacked: true, ticks: { color: '#a0aec0' } }
+      }
     }
-  };
+  });
 }
 
-function stackedAxis() {
-  return { stacked: true, ticks:{ color:'#64748b', font:{size:11} }, grid:{ color:'rgba(255,255,255,0.04)' } };
+function buildAdjudicationChart(subs) {
+  const sorted = [...subs].sort((a,b) => a.month.localeCompare(b.month)).slice(-12);
+  const ctx = document.getElementById('chart-adjudication')?.getContext('2d');
+  if (!ctx) return;
+  STATE.charts.adjudication = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: sorted.map(s => monthLabel(s.month)),
+      datasets: [
+        { label: 'Filed', data: sorted.map(s => +(s.answers.q7_casesFiled||0)), borderColor: '#ecc94b', tension: 0.3 },
+        { label: 'Disposed', data: sorted.map(s => +(s.answers.q7_casesDecided||0)), borderColor: '#48bb78', tension: 0.3 }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0' } } },
+      scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a0aec0' } }, x: { ticks: { color: '#a0aec0' } } }
+    }
+  });
+}
+
+function buildFboGrowthChart(subs) {
+  const sorted = [...subs].sort((a,b) => a.month.localeCompare(b.month)).slice(-12);
+  const ctx = document.getElementById('chart-fbos')?.getContext('2d');
+  if (!ctx) return;
+  STATE.charts.fbos = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: sorted.map(s => monthLabel(s.month)),
+      datasets: [{ label: 'FBOs', data: sorted.map(s => +(s.answers.q1_totalFbo||0)), borderColor: '#3182ce', backgroundColor: 'rgba(49,130,206,0.1)', fill: true, tension: 0.3 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a0aec0' } }, x: { ticks: { color: '#a0aec0' } } }
+    }
+  });
 }
 
 function destroyAllCharts() {
-  Object.values(STATE.charts).forEach(c => { try { c.destroy(); } catch(e){} });
-  STATE.charts = {};
+  Object.keys(STATE.charts).forEach(k => {
+    if (STATE.charts[k]) { STATE.charts[k].destroy(); STATE.charts[k] = null; }
+  });
 }
 
-// ── Monthly Report ─────────────────────────────────────────
+// ── Monthly Report ──────────────────────────────────────────
 function renderMonthlyReport() {
-  const month = document.getElementById('monthly-report-select')?.value;
-  if (!month) return;
+  const month = document.getElementById('monthly-report-select').value;
   const sub = STATE.submissions.find(s => s.month === month);
   const el  = document.getElementById('monthly-report-content');
   if (!sub) {
@@ -704,25 +846,48 @@ function renderMonthlyReport() {
     return;
   }
 
-  const rows = STATE.questions.filter(q => q.type !== 'file').map((q, i) => {
-    const val = sub.answers[q.id]?.text || '—';
-    return `<tr>
-      <td style="width:40px;font-weight:700;text-align:center;">${i+1}</td>
-      <td><strong>${q.label}</strong></td>
-      <td style="text-align:center;font-weight:700;color:var(--accent-blue);">${val}</td>
-    </tr>`;
-  }).join('');
+  let htmlRows = '';
+  questions.forEach(q => {
+    htmlRows += `
+      <tr style="background:rgba(255,255,255,0.01);">
+        <td colspan="3" style="font-weight:800;color:var(--accent-blue);padding:10px;">${q.label}</td>
+      </tr>`;
+    q.subfields.forEach(subfield => {
+      const val = sub.answers?.[subfield.id] || '—';
+      htmlRows += `
+        <tr>
+          <td style="padding-left:30px;color:var(--text-secondary);">${subfield.label}</td>
+          <td style="text-align:center;font-weight:700;color:var(--text-primary);">${val}</td>
+        </tr>`;
+    });
+  });
 
-  const fileQ = STATE.questions.filter(q => q.type === 'file');
-  const fileSection = fileQ.map(q => {
-    const files = sub.answers[q.id]?.files || [];
-    if (!files.length) return '';
-    return `<div style="margin-top:16px;"><strong>📎 ${q.label}</strong>
-      <div class="file-list" style="margin-top:8px;">
-        ${files.map(f => `<div class="file-item"><span class="file-icon">${getFileIcon(f.type)}</span>
-          <div class="file-info"><div class="file-name">${f.name}</div><div class="file-size">${formatSize(f.size)}</div></div></div>`).join('')}
-      </div></div>`;
-  }).join('');
+  let annexRows = '';
+  annexures.forEach(annex => {
+    const rows = sub.annexures?.[annex.id] || [];
+    if (!rows.length) return;
+    
+    annexRows += `
+      <div style="margin-top:20px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
+        <div style="background:rgba(255,255,255,0.02);padding:10px;font-weight:700;font-size:12px;border-bottom:1px solid var(--border);">${annex.title}</div>
+        <div style="overflow-x:auto;">
+          <table class="report-table" style="font-size:12px;">
+            <thead>
+              <tr style="background:rgba(0,0,0,0.2);">
+                ${annex.cols.map(c => `<th>${c.label}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(row => `
+                <tr>
+                  ${annex.cols.map(c => `<td>${row[c.key] || '—'}</td>`).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  });
 
   el.innerHTML = `
     <div class="report-header-block">
@@ -738,15 +903,11 @@ function renderMonthlyReport() {
     </div>
     <table class="report-table">
       <thead>
-        <tr><th style="width:40px;">#</th><th>Parameter</th><th style="width:120px;">Value</th></tr>
+        <tr><th>Parameter / subfield</th><th style="width:140px;text-align:center;">Value</th></tr>
       </thead>
-      <tbody>${rows}</tbody>
+      <tbody>${htmlRows}</tbody>
     </table>
-    ${fileSection}
-    <div style="margin-top:24px;padding:16px;background:var(--bg-glass);border-radius:var(--radius-md);border:1px solid var(--border);">
-      <strong>📌 Remarks:</strong>
-      <p style="margin-top:8px;font-size:13px;color:var(--text-secondary);">${sub.answers.q16?.text || 'No remarks.'}</p>
-    </div>
+    ${annexRows}
     <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;color:var(--text-muted);">
       <div>Submitted by: <strong style="color:var(--text-primary);">${sub.submittedBy}</strong></div>
       <div>Submitted on: <strong style="color:var(--text-primary);">${formatDate(sub.submittedAt)}</strong></div>
@@ -772,29 +933,34 @@ function renderYearlyReport() {
     return;
   }
 
-  const sum = k => subs.reduce((a,s) => a + +(s.answers[k]?.text||0), 0);
+  const sum = k => subs.reduce((a,s) => a + +(s.answers[k]||0), 0);
   const avg = k => subs.length ? (sum(k)/subs.length).toFixed(1) : 0;
-  const lastFBO = subs[subs.length-1]?.answers?.q1?.text || '0';
+  const lastFBO = subs[subs.length-1]?.answers?.q1_totalFbo || '0';
 
   const totals = {
-    fbos: lastFBO, inspections: sum('q2'), samples: sum('q3'),
-    sampled: sum('q4'), unsafe: sum('q5'), substandard: sum('q6'),
-    conform: sum('q7'), misbranded: sum('q8'), adjPending: sum('q10'),
-    adjDisposed: sum('q11'), prosecutions: sum('q13')
+    fbos: lastFBO,
+    inspections: subs.reduce((a,s) => a + +(s.answers.q2_staticUnits||0) + +(s.answers.q2_mobileUnits||0), 0),
+    samples: sum('q3_samplesSent'),
+    conform: sum('q4_conform'),
+    unsafe: sum('q4_unsafe'),
+    substandard: sum('q4_substandard'),
+    adjPending: sum('q7_casesPending'),
+    adjDisposed: sum('q7_casesDecided'),
+    prosecutions: sum('q10_prosecutionsLaunched')
   };
 
-  const safeRate = totals.sampled > 0 ? ((totals.conform / totals.sampled)*100).toFixed(1) : '—';
+  const safeRate = totals.samples > 0 ? (((totals.samples - totals.unsafe - totals.substandard) / totals.samples)*100).toFixed(1) : '—';
 
   const monthRows = subs.map(s => `
     <tr>
       <td><strong>${monthLabel(s.month)}</strong></td>
-      <td>${s.answers.q2?.text||0}</td>
-      <td>${s.answers.q3?.text||0}</td>
-      <td>${s.answers.q5?.text||0}</td>
-      <td>${s.answers.q6?.text||0}</td>
-      <td>${s.answers.q7?.text||0}</td>
-      <td>${s.answers.q10?.text||0}</td>
-      <td>${s.answers.q11?.text||0}</td>
+      <td>${(+(s.answers.q2_staticUnits||0)) + (+(s.answers.q2_mobileUnits||0))}</td>
+      <td>${s.answers.q3_samplesSent||0}</td>
+      <td>${s.answers.q4_unsafe||0}</td>
+      <td>${s.answers.q4_substandard||0}</td>
+      <td>${s.answers.q4_conform||0}</td>
+      <td>${s.answers.q7_casesPending||0}</td>
+      <td>${s.answers.q7_casesDecided||0}</td>
     </tr>`).join('');
 
   el.innerHTML = `
@@ -825,26 +991,6 @@ function renderYearlyReport() {
       </thead>
       <tbody>
         ${monthRows}
-        <tr style="background:rgba(99,179,237,0.08);">
-          <td><strong>TOTAL</strong></td>
-          <td><strong>${totals.inspections}</strong></td>
-          <td><strong>${totals.samples}</strong></td>
-          <td><strong style="color:var(--accent-red)">${totals.unsafe}</strong></td>
-          <td><strong style="color:var(--accent-orange)">${totals.substandard}</strong></td>
-          <td><strong style="color:var(--accent-green)">${totals.conform}</strong></td>
-          <td><strong>${totals.adjPending}</strong></td>
-          <td><strong>${totals.adjDisposed}</strong></td>
-        </tr>
-        <tr style="background:rgba(183,148,244,0.06);">
-          <td><strong>MONTHLY AVG</strong></td>
-          <td><strong>${avg('q2')}</strong></td>
-          <td><strong>${avg('q3')}</strong></td>
-          <td><strong>${avg('q5')}</strong></td>
-          <td><strong>${avg('q6')}</strong></td>
-          <td><strong>${avg('q7')}</strong></td>
-          <td><strong>${avg('q10')}</strong></td>
-          <td><strong>${avg('q11')}</strong></td>
-        </tr>
       </tbody>
     </table>
 
@@ -900,120 +1046,52 @@ function renderUserManagement() {
 }
 
 function approveUser(email) {
-  const user = ALL_USERS.find(u => u.email === email);
-  if (user) {
-    user.approved = true;
-    saveUsers();
-    renderUserManagement();
-    showToast('✅ User approved successfully.', 'success');
-  }
+  const idx = ALL_USERS.findIndex(u => u.email === email);
+  if (idx >= 0) { ALL_USERS[idx].approved = true; saveUsers(); renderUserManagement(); showToast('Approved successfully.'); }
 }
-
 function revokeUser(email) {
-  const user = ALL_USERS.find(u => u.email === email);
-  if (user) {
-    user.approved = false;
-    saveUsers();
-    renderUserManagement();
-    showToast('User access revoked.', 'error');
-  }
+  const idx = ALL_USERS.findIndex(u => u.email === email);
+  if (idx >= 0) { ALL_USERS[idx].approved = false; saveUsers(); renderUserManagement(); showToast('Approval revoked.'); }
 }
-
 function deleteUser(email) {
-  if (!confirm('Are you sure you want to permanently delete this user?')) return;
+  if (!confirm('Are you sure you want to delete this user?')) return;
   ALL_USERS = ALL_USERS.filter(u => u.email !== email);
   saveUsers();
   renderUserManagement();
-  showToast('🗑️ User deleted.', 'error');
+  showToast('User deleted.', 'error');
 }
 
-// ── Form Builder ───────────────────────────────────────────
-function renderBuilder() {
-  const list = document.getElementById('builder-list');
-  list.innerHTML = STATE.questions.map((q, i) => `
-    <div class="builder-item">
-      <span class="builder-drag">⠿</span>
-      <span class="builder-label ${q.bold ? 'is-bold' : ''}">${i+1}. ${q.label}</span>
-      <span class="builder-type-badge">
-        <span class="badge ${q.type === 'file' ? 'badge-purple' : q.type === 'textarea' ? 'badge-orange' : 'badge-blue'}">
-          ${q.type === 'file' ? '📎 File' : q.type === 'textarea' ? '📝 Long Text' : '✏️ Text'}
-        </span>
-        ${q.bold ? '<span class="badge badge-green" style="margin-left:4px;">Bold</span>' : ''}
-      </span>
-      <div class="builder-actions">
-        <button class="btn btn-outline btn-sm" onclick="toggleBold(${i})">
-          ${q.bold ? '🔡 Unbold' : '𝐁 Bold'}
-        </button>
-        <button class="btn btn-danger btn-sm" onclick="deleteQuestion(${i})">🗑️</button>
-      </div>
-    </div>`).join('');
+// ── Helpers & UI Actions ───────────────────────────────────
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 
-function toggleBold(idx) {
-  STATE.questions[idx].bold = !STATE.questions[idx].bold;
-  saveQuestions();
-  renderBuilder();
-  renderFormQuestions();
-}
-
-function deleteQuestion(idx) {
-  if (!confirm('Delete this question?')) return;
-  STATE.questions.splice(idx, 1);
-  saveQuestions();
-  renderBuilder();
-  renderFormQuestions();
-  showToast('Question deleted.', 'info');
-}
-
-function addQuestion() {
-  const label = document.getElementById('new-q-label').value.trim();
-  const type  = document.getElementById('new-q-type').value;
-  const bold  = document.getElementById('new-q-bold').checked;
-  if (!label) { showToast('Please enter a question.', 'error'); return; }
-
-  const id = 'q_custom_' + Date.now();
-  STATE.questions.push({ id, label, type, bold });
-  saveQuestions();
-  renderBuilder();
-  renderFormQuestions();
-  document.getElementById('new-q-label').value = '';
-  showToast('✅ Question added!', 'success');
-}
-
-// ── Export JSON ────────────────────────────────────────────
-function exportJSON() {
-  const data = JSON.stringify({ submissions: STATE.submissions, questions: STATE.questions }, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = 'fss-data-export.json';
-  a.click(); URL.revokeObjectURL(url);
-  showToast('📦 Data exported as JSON!', 'success');
-}
-
-// ── Utilities ──────────────────────────────────────────────
 function updateBadge() {
-  document.getElementById('badge-submissions').textContent = STATE.submissions.length;
+  const badge = document.getElementById('badge-submissions');
+  if (badge) {
+    const count = STATE.submissions.length;
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-block' : 'none';
+  }
 }
 
-function formatDate(isoStr) {
-  if (!isoStr) return '—';
-  return new Date(isoStr).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-}
-
-function showToast(message, type = 'info') {
-  const container = document.getElementById('toast-container');
+function showToast(msg, type = 'success') {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  toast.innerHTML = `<span>${message}</span>`;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3200);
+  toast.innerHTML = `<span style="font-size:16px;">${type === 'success' ? '🔔' : '⚠️'}</span> <span>${msg}</span>`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 50);
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3500);
 }
 
-// ── Keyboard shortcut: Enter on login ─────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('login-pass').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doLogin();
-  });
-  init();
-});
+function exportJSON() {
+  const data = JSON.stringify(STATE.submissions, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `FSO_Submissions_Export_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+window.onload = init;
