@@ -395,11 +395,18 @@ function renderFormQuestions() {
   questions.forEach(q => {
     const annexLinkHTML = q.annexLink ? `<a href="#box-${q.annexLink}" style="color:var(--accent-blue);font-size:11px;margin-left:12px;text-decoration:none;font-weight:500;border:1px solid rgba(99,179,237,0.3);padding:2px 8px;border-radius:12px;display:inline-block;" onclick="scrollToAnnex(event, '${q.annexLink}')">🔗 Go to ${q.annexLabel}</a>` : '';
 
+    // Calculate totals for specific questions
+    let totalHTML = '';
+    if (['q1', 'q2', 'q4', 'q7', 'q13'].includes(q.id)) {
+      totalHTML = `<span style="margin-left:auto;font-weight:bold;color:var(--accent-green);font-size:12px;background:rgba(72,187,120,0.1);padding:2px 8px;border-radius:6px;display:inline-block;">Total: <span id="total-${q.id}">0</span></span>`;
+    }
+
     html += `
       <div class="fixed-q-box" style="background:var(--bg-secondary);border:1px solid var(--border);padding:16px 18px;border-radius:var(--radius-sm);margin-bottom:14px;">
-        <div class="fixed-q-title" style="font-weight:700;font-size:14px;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div class="fixed-q-title" style="font-weight:700;font-size:14px;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;width:100%;">
           <span>${q.label}</span>
           ${annexLinkHTML}
+          ${totalHTML}
         </div>`;
     q.subfields.forEach(sub => {
       const type = sub.type || 'number';
@@ -435,6 +442,7 @@ function renderFormQuestions() {
           <table class="annex-table" style="width:100%;border-collapse:collapse;">
             <thead>
               <tr style="background:var(--bg-primary);">
+                <th style="font-size:11px;font-weight:700;text-transform:uppercase;padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border);text-align:left;width:50px;">S.No</th>
                 ${annex.cols.map(c=>`<th style="font-size:11px;font-weight:700;text-transform:uppercase;padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border);text-align:left;">${c.label}</th>`).join('')}
                 <th style="font-size:11px;font-weight:700;text-transform:uppercase;padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border);text-align:left;width:50px;">Del</th>
               </tr>
@@ -447,6 +455,7 @@ function renderFormQuestions() {
 
   html += '</div>';
   container.innerHTML = html;
+  setupAutoTotals();
 }
 
 function scrollToAnnex(event, annexId) {
@@ -461,6 +470,49 @@ function scrollToAnnex(event, annexId) {
   }
 }
 
+function recalculateSerials(annexId) {
+  const tbody = document.getElementById(`tbody-${annexId}`);
+  if (!tbody) return;
+  Array.from(tbody.children).forEach((tr, idx) => {
+    const sNoTd = tr.firstElementChild;
+    if (sNoTd) sNoTd.textContent = idx + 1;
+  });
+}
+
+function setupAutoTotals() {
+  const qConfigs = [
+    { totalId: 'total-q1', inputs: ['ans-q1_regCert', 'ans-q1_licences'], targetInput: 'ans-q1_totalFbo' },
+    { totalId: 'total-q2', inputs: ['ans-q2_staticUnits', 'ans-q2_mobileUnits'] },
+    { totalId: 'total-q4', inputs: ['ans-q4_conform', 'ans-q4_unsafe', 'ans-q4_substandard', 'ans-q4_misbranded'] },
+    { totalId: 'total-q7', inputs: ['ans-q7_casesFiled', 'ans-q7_casesDecided', 'ans-q7_casesPending'] },
+    { totalId: 'total-q13', inputs: ['ans-q13_eatRightStations', 'ans-q13_eatRightCampus'] }
+  ];
+
+  qConfigs.forEach(config => {
+    const update = () => {
+      const sum = config.inputs.reduce((acc, id) => {
+        const val = parseFloat(document.getElementById(id)?.value) || 0;
+        return acc + val;
+      }, 0);
+      
+      const labelEl = document.getElementById(config.totalId);
+      if (labelEl) labelEl.textContent = sum;
+      
+      if (config.targetInput) {
+        const targetEl = document.getElementById(config.targetInput);
+        if (targetEl) targetEl.value = sum;
+      }
+    };
+
+    config.inputs.forEach(id => {
+      document.getElementById(id)?.addEventListener('input', update);
+    });
+    
+    // Run once initially
+    update();
+  });
+}
+
 function addAnnexRow(annexId, rowData = null) {
   const annex = annexures.find(a => a.id === annexId);
   const tbody = document.getElementById(`tbody-${annexId}`);
@@ -468,12 +520,15 @@ function addAnnexRow(annexId, rowData = null) {
   const tr = document.createElement('tr');
   tr.style.borderBottom = '1px solid var(--border)';
 
-  let tds = annex.cols.map(c => {
+  const serialNo = tbody.children.length + 1;
+  let tds = `<td style="padding:8px 10px;color:var(--text-secondary);font-size:12px;font-weight:bold;text-align:center;">${serialNo}</td>`;
+
+  tds += annex.cols.map(c => {
     const val = rowData ? (rowData[c.key] || '') : '';
     return `<td style="padding:8px 10px;"><input type="${c.type}" class="annex-input" data-key="${c.key}" value="${val}" style="width:100%;padding:6px 8px;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-primary);font-size:12px;border-radius:4px;outline:none;" /></td>`;
   }).join('');
 
-  tds += `<td style="padding:8px 10px;text-align:center;"><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()" style="padding:4px 8px;font-size:11px;">✕</button></td>`;
+  tds += `<td style="padding:8px 10px;text-align:center;"><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove(); recalculateSerials('${annexId}')" style="padding:4px 8px;font-size:11px;">✕</button></td>`;
   tr.innerHTML = tds;
   tbody.appendChild(tr);
 }
@@ -503,6 +558,7 @@ function loadFormData(sub) {
       });
     });
   }
+  setupAutoTotals();
 }
 
 // ── Submit Form ────────────────────────────────────────────
@@ -646,14 +702,37 @@ function viewSubmission(id) {
 
   // Render 16 questions
   html += '<h3 style="font-size:14px;font-weight:700;color:var(--accent-blue);margin-bottom:10px;">16 Fixed Questions</h3>';
+  
+  const sumSubfields = (qId) => {
+    const q = questions.find(x => x.id === qId);
+    if (!q) return 0;
+    return q.subfields.reduce((acc, subfield) => {
+      const val = parseFloat(sub.answers?.[subfield.id]) || 0;
+      return acc + val;
+    }, 0);
+  };
+
   questions.forEach((q, i) => {
+    const annexLinkHTML = q.annexLink ? `<a href="#box-${q.annexLink}" class="no-print" style="color:var(--accent-blue);font-size:11px;margin-left:12px;text-decoration:none;font-weight:500;" onclick="scrollToAnnex(event, '${q.annexLink}')">🔗 Go to ${q.annexLabel}</a>` : '';
+
+    // Calculate totals for specific questions
+    let totalHTML = '';
+    if (['q1', 'q2', 'q4', 'q7', 'q13'].includes(q.id)) {
+      totalHTML = `<span style="float:right;font-weight:bold;color:var(--accent-green);font-size:12px;background:rgba(72,187,120,0.1);padding:2px 8px;border-radius:6px;">Total: ${sumSubfields(q.id)}</span>`;
+    }
+
     html += `
       <div style="margin-bottom:14px;padding:12px;background:var(--bg-glass);border-radius:var(--radius-sm);border:1px solid var(--border);">
-        <div style="font-size:12px;font-weight:800;color:var(--text-primary);margin-bottom:6px;">${q.label}</div>`;
+        <div style="font-size:12px;font-weight:800;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:8px;">
+          <span>${q.label} ${annexLinkHTML}</span>
+          ${totalHTML}
+        </div>`;
     q.subfields.forEach(subfield => {
+      const subAnnexLinkHTML = subfield.annexLink ? `<a href="#box-${subfield.annexLink}" class="no-print" style="color:var(--accent-blue);font-size:11px;margin-left:8px;text-decoration:none;font-weight:normal;" onclick="scrollToAnnex(event, '${subfield.annexLink}')">🔗 ${subfield.annexLabel}</a>` : '';
+
       html += `
         <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px dashed rgba(255,255,255,0.05);">
-          <span style="color:var(--text-secondary);">${subfield.label}</span>
+          <span style="color:var(--text-secondary);display:flex;align-items:center;">${subfield.label} ${subAnnexLinkHTML}</span>
           <span style="font-weight:700;color:var(--text-primary);">${sub.answers?.[subfield.id] || '—'}</span>
         </div>`;
     });
@@ -667,18 +746,20 @@ function viewSubmission(id) {
     if (!rows.length) return;
     
     html += `
-      <div style="margin-bottom:14px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-glass);">
+      <div id="box-${annex.id}" style="margin-bottom:14px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-glass);">
         <div style="background:rgba(255,255,255,0.02);padding:8px 12px;font-weight:700;font-size:12px;color:var(--text-primary);border-bottom:1px solid var(--border);">${annex.title}</div>
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;font-size:12px;">
             <thead>
               <tr style="background:rgba(0,0,0,0.2);">
+                <th style="padding:6px 8px;color:var(--text-secondary);border-bottom:1px solid var(--border);text-align:left;width:50px;">S.No</th>
                 ${annex.cols.map(c => `<th style="padding:6px 8px;color:var(--text-secondary);border-bottom:1px solid var(--border);text-align:left;">${c.label}</th>`).join('')}
               </tr>
             </thead>
             <tbody>
-              ${rows.map(row => `
+              ${rows.map((row, idx) => `
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.02);">
+                  <td style="padding:6px 8px;color:var(--text-secondary);font-weight:bold;">${idx + 1}</td>
                   ${annex.cols.map(c => `<td style="padding:6px 8px;color:var(--text-secondary);">${row[c.key] || '—'}</td>`).join('')}
                 </tr>
               `).join('')}
@@ -868,17 +949,38 @@ function renderMonthlyReport() {
     return;
   }
 
+  const sumSubfields = (qId) => {
+    const q = questions.find(x => x.id === qId);
+    if (!q) return 0;
+    return q.subfields.reduce((acc, subfield) => {
+      const val = parseFloat(sub.answers?.[subfield.id]) || 0;
+      return acc + val;
+    }, 0);
+  };
+
   let htmlRows = '';
   questions.forEach(q => {
+    const annexLinkHTML = q.annexLink ? `<a href="#box-${q.annexLink}" class="no-print" style="color:var(--accent-blue);font-size:11px;margin-left:12px;text-decoration:none;font-weight:500;" onclick="scrollToAnnex(event, '${q.annexLink}')">🔗 Go to ${q.annexLabel}</a>` : '';
+
+    // Calculate totals for specific questions
+    let totalHTML = '';
+    if (['q1', 'q2', 'q4', 'q7', 'q13'].includes(q.id)) {
+      totalHTML = `<span style="float:right;font-weight:bold;color:var(--accent-green);font-size:12px;background:rgba(72,187,120,0.1);padding:2px 8px;border-radius:6px;">Total: ${sumSubfields(q.id)}</span>`;
+    }
+
     htmlRows += `
       <tr style="background:rgba(255,255,255,0.01);">
-        <td colspan="3" style="font-weight:800;color:var(--accent-blue);padding:10px;">${q.label}</td>
+        <td colspan="2" style="font-weight:800;color:var(--accent-blue);padding:10px;display:flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;">
+          <span>${q.label} ${annexLinkHTML}</span>
+          ${totalHTML}
+        </td>
       </tr>`;
     q.subfields.forEach(subfield => {
+      const subAnnexLinkHTML = subfield.annexLink ? `<a href="#box-${subfield.annexLink}" class="no-print" style="color:var(--accent-blue);font-size:11px;margin-left:8px;text-decoration:none;font-weight:normal;" onclick="scrollToAnnex(event, '${subfield.annexLink}')">🔗 ${subfield.annexLabel}</a>` : '';
       const val = sub.answers?.[subfield.id] || '—';
       htmlRows += `
         <tr>
-          <td style="padding-left:30px;color:var(--text-secondary);">${subfield.label}</td>
+          <td style="padding-left:30px;color:var(--text-secondary);">${subfield.label} ${subAnnexLinkHTML}</td>
           <td style="text-align:center;font-weight:700;color:var(--text-primary);">${val}</td>
         </tr>`;
     });
@@ -890,18 +992,20 @@ function renderMonthlyReport() {
     if (!rows.length) return;
     
     annexRows += `
-      <div style="margin-top:20px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
+      <div id="box-${annex.id}" style="margin-top:20px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
         <div style="background:rgba(255,255,255,0.02);padding:10px;font-weight:700;font-size:12px;border-bottom:1px solid var(--border);">${annex.title}</div>
         <div style="overflow-x:auto;">
           <table class="report-table" style="font-size:12px;">
             <thead>
               <tr style="background:rgba(0,0,0,0.2);">
+                <th style="padding:6px 8px;color:var(--text-secondary);border-bottom:1px solid var(--border);text-align:left;width:50px;">S.No</th>
                 ${annex.cols.map(c => `<th>${c.label}</th>`).join('')}
               </tr>
             </thead>
             <tbody>
-              ${rows.map(row => `
+              ${rows.map((row, idx) => `
                 <tr>
+                  <td style="padding:6px 8px;color:var(--text-secondary);font-weight:bold;">${idx + 1}</td>
                   ${annex.cols.map(c => `<td>${row[c.key] || '—'}</td>`).join('')}
                 </tr>
               `).join('')}

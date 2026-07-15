@@ -635,7 +635,7 @@ select option { background: var(--bg-secondary); }
 ══════════════════════════════════════════════ */
 @media print {
   .sidebar, .form-toolbar, .report-selector, .page-header .header-actions,
-  .btn, #toast-container, .modal-overlay { display: none !important; }
+  .btn, #toast-container, .modal-overlay, .no-print { display: none !important; }
   .main-content { margin-left: 0 !important; padding: 0 !important; }
   body { background: white !important; color: black !important; }
   .report-content { border: none !important; background: white !important; color: black !important; }
