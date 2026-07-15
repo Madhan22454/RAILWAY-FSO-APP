@@ -434,7 +434,8 @@ function renderFormQuestions() {
   annexures.forEach(annex => {
     html += `
       <div class="annexure-box" id="box-${annex.id}" style="margin-top:20px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-secondary);margin-bottom:20px;">
-        <div class="annexure-header" style="background:var(--bg-secondary);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">
+        <div class="annexure-header" style="background:var(--bg-secondary);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);position:relative;">
+          <a id="box-${annex.id}" name="box-${annex.id}" style="position:absolute;top:-20px;"></a>
           <span class="annexure-title" style="font-weight:700;font-size:13px;color:var(--accent-blue);">${annex.title}</span>
           <button class="btn btn-primary btn-sm" onclick="addAnnexRow('${annex.id}')" style="padding:6px 12px;font-size:12px;">+ Add Row</button>
         </div>
@@ -758,7 +759,10 @@ function viewSubmission(id) {
     
     html += `
       <div id="modal-box-${annex.id}" style="margin-bottom:14px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-glass);">
-        <div style="background:rgba(255,255,255,0.02);padding:8px 12px;font-weight:700;font-size:12px;color:var(--text-primary);border-bottom:1px solid var(--border);">${annex.title}</div>
+        <div style="background:rgba(255,255,255,0.02);padding:8px 12px;font-weight:700;font-size:12px;color:var(--text-primary);border-bottom:1px solid var(--border);position:relative;">
+          <a id="modal-box-${annex.id}" name="modal-box-${annex.id}" style="position:absolute;top:-20px;"></a>
+          ${annex.title}
+        </div>
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;font-size:12px;">
             <thead>
@@ -1004,7 +1008,10 @@ function renderMonthlyReport() {
     
     annexRows += `
       <div id="report-box-${annex.id}" style="margin-top:20px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
-        <div style="background:rgba(255,255,255,0.02);padding:10px;font-weight:700;font-size:12px;border-bottom:1px solid var(--border);">${annex.title}</div>
+        <div style="background:rgba(255,255,255,0.02);padding:10px;font-weight:700;font-size:12px;border-bottom:1px solid var(--border);position:relative;">
+          <a id="report-box-${annex.id}" name="report-box-${annex.id}" style="position:absolute;top:-20px;"></a>
+          ${annex.title}
+        </div>
         <div style="overflow-x:auto;">
           <table class="report-table" style="font-size:12px;">
             <thead>
