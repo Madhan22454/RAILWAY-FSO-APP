@@ -14,16 +14,16 @@ const questions = [
     ]
   },
   {
-    id: "q2", label: "2. Total Number of Inspections Done",
+    id: "q2", label: "2. Total Number of Inspections Done", annexLink: "annex2", annexLabel: "ANNEX. II",
     subfields: [
       { id: "q2_staticUnits", label: "Static Units", type: "number" },
       { id: "q2_mobileUnits", label: "Mobile Units", type: "number" }
     ]
   },
-  { id: "q3", label: "3. Number of Food Samples Sent for Analysis",
+  { id: "q3", label: "3. Number of Food Samples Sent for Analysis", annexLink: "annex3", annexLabel: "ANNEX. III",
     subfields: [{ id: "q3_samplesSent", label: "Samples Sent", type: "number" }] },
   {
-    id: "q4", label: "4. Number of Food Samples Analysed (Result Received)",
+    id: "q4", label: "4. Number of Food Samples Analysed (Result Received)", annexLink: "annex4", annexLabel: "ANNEX. IV",
     subfields: [
       { id: "q4_conform",     label: "Conform to Standard", type: "number" },
       { id: "q4_unsafe",      label: "Unsafe", type: "number" },
@@ -31,40 +31,40 @@ const questions = [
       { id: "q4_misbranded",  label: "Misbranded", type: "number" }
     ]
   },
-  { id: "q5", label: "5. Number of Meetings Attended",
+  { id: "q5", label: "5. Number of Meetings Attended", annexLink: "annex5", annexLabel: "ANNEX. V",
     subfields: [{ id: "q5_meetings", label: "Meetings", type: "number" }] },
-  { id: "q6", label: "6. Number of FBO Trainings / IEC Activities",
+  { id: "q6", label: "6. Number of FBO Trainings / IEC Activities", annexLink: "annex6", annexLabel: "ANNEX. VI",
     subfields: [{ id: "q6_trainings", label: "Trainings / IEC", type: "number" }] },
   {
     id: "q7", label: "7. Adjudication",
     subfields: [
-      { id: "q7_casesFiled",   label: "Cases Filed before AO", type: "number" },
-      { id: "q7_casesDecided", label: "Cases Disposed", type: "number" },
-      { id: "q7_casesPending", label: "Cases Pending", type: "number" }
+      { id: "q7_casesFiled",   label: "Cases Filed before AO", type: "number", annexLink: "annex7A", annexLabel: "ANNEX. VII.A" },
+      { id: "q7_casesDecided", label: "Cases Disposed", type: "number", annexLink: "annex7B", annexLabel: "ANNEX. VII.B" },
+      { id: "q7_casesPending", label: "Cases Pending", type: "number", annexLink: "annex7C", annexLabel: "ANNEX. VII.C" }
     ]
   },
-  { id: "q8", label: "8. Convictions and Penalties against FBO",
+  { id: "q8", label: "8. Convictions and Penalties against FBO", annexLink: "annex8", annexLabel: "ANNEX. VIII",
     subfields: [{ id: "q8_convictions", label: "Details", type: "text" }] },
   { id: "q9", label: "9. Amount Realized",
     subfields: [{ id: "q9_amountRealized", label: "Amount (Rs.)", type: "number" }] },
-  { id: "q10", label: "10. Prosecution Cases Launched",
+  { id: "q10", label: "10. Prosecution Cases Launched", annexLink: "annex9A", annexLabel: "ANNEX. IX.A",
     subfields: [{ id: "q10_prosecutionsLaunched", label: "Cases Launched", type: "number" }] },
-  { id: "q11", label: "11. Prosecution Cases Pending",
+  { id: "q11", label: "11. Prosecution Cases Pending", annexLink: "annex9B", annexLabel: "ANNEX. IX.B",
     subfields: [{ id: "q11_prosecutionsPending", label: "Cases Pending", type: "number" }] },
-  { id: "q12", label: "12. Punishments Awarded",
+  { id: "q12", label: "12. Punishments Awarded", annexLink: "annex10", annexLabel: "ANNEX. X",
     subfields: [{ id: "q12_punishments", label: "Details", type: "text" }] },
   {
-    id: "q13", label: "13. Eat Right Stations & Campus",
+    id: "q13", label: "13. Eat Right Stations & Campus", annexLink: "annex11", annexLabel: "ANNEX. XI",
     subfields: [
       { id: "q13_eatRightStations", label: "Eat Right Stations", type: "number" },
       { id: "q13_eatRightCampus",   label: "Eat Right Campus", type: "number" }
     ]
   },
-  { id: "q14", label: "14. Pending Action on Unsatisfactory Samples",
+  { id: "q14", label: "14. Pending Action on Unsatisfactory Samples", annexLink: "annex12", annexLabel: "ANNEX. XII",
     subfields: [{ id: "q14_pendingActionUnsatisfactory", label: "Details", type: "text" }] },
-  { id: "q15", label: "15. Courts Attended",
+  { id: "q15", label: "15. Courts Attended", annexLink: "annex13", annexLabel: "ANNEX. XIII",
     subfields: [{ id: "q15_courtsAttended", label: "Number of Courts", type: "number" }] },
-  { id: "q16", label: "16. Food Safety Incidents / Public Complaints Attended",
+  { id: "q16", label: "16. Food Safety Incidents / Public Complaints Attended", annexLink: "annex14", annexLabel: "ANNEX. XIV",
     subfields: [{ id: "q16_incidentsComplaints", label: "Incidents / Complaints", type: "number" }] }
 ];
 
@@ -393,14 +393,24 @@ function renderFormQuestions() {
 
   // Render 16 questions
   questions.forEach(q => {
+    const annexLinkHTML = q.annexLink ? `<a href="#box-${q.annexLink}" style="color:var(--accent-blue);font-size:11px;margin-left:12px;text-decoration:none;font-weight:500;border:1px solid rgba(99,179,237,0.3);padding:2px 8px;border-radius:12px;display:inline-block;" onclick="scrollToAnnex(event, '${q.annexLink}')">🔗 Go to ${q.annexLabel}</a>` : '';
+
     html += `
       <div class="fixed-q-box" style="background:var(--bg-secondary);border:1px solid var(--border);padding:16px 18px;border-radius:var(--radius-sm);margin-bottom:14px;">
-        <div class="fixed-q-title" style="font-weight:700;font-size:14px;color:var(--text-primary);margin-bottom:14px;">${q.label}</div>`;
+        <div class="fixed-q-title" style="font-weight:700;font-size:14px;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+          <span>${q.label}</span>
+          ${annexLinkHTML}
+        </div>`;
     q.subfields.forEach(sub => {
       const type = sub.type || 'number';
+      const subAnnexLinkHTML = sub.annexLink ? `<a href="#box-${sub.annexLink}" style="color:var(--accent-blue);font-size:11px;margin-left:8px;text-decoration:none;font-weight:normal;" onclick="scrollToAnnex(event, '${sub.annexLink}')">🔗 ${sub.annexLabel}</a>` : '';
+
       html += `
         <div class="subfield-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--border);">
-          <div class="subfield-label" style="font-size:13px;color:var(--text-secondary);flex:1;">${sub.label}</div>
+          <div class="subfield-label" style="font-size:13px;color:var(--text-secondary);flex:1;display:flex;align-items:center;gap:6px;">
+            <span>${sub.label}</span>
+            ${subAnnexLinkHTML}
+          </div>
           <div class="subfield-input">
             <input type="${type}" id="ans-${sub.id}" placeholder="${type==='number'?'0':'—'}" style="padding:8px 12px;background:var(--bg-primary);border:1px solid var(--border);border-radius:5px;color:var(--text-primary);font-size:13px;width:180px;outline:none;" />
           </div>
@@ -437,6 +447,18 @@ function renderFormQuestions() {
 
   html += '</div>';
   container.innerHTML = html;
+}
+
+function scrollToAnnex(event, annexId) {
+  event.preventDefault();
+  const el = document.getElementById(`box-${annexId}`);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.style.boxShadow = '0 0 15px #3182ce';
+    setTimeout(() => {
+      el.style.boxShadow = '';
+    }, 1500);
+  }
 }
 
 function addAnnexRow(annexId, rowData = null) {
