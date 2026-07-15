@@ -712,13 +712,6 @@ select option { background: var(--bg-secondary); }
 
 @media print {
   .annex-link {
-    display: inline-block !important;
-    color: #1e40af !important;
-    text-decoration: underline !important;
-    font-size: 11px !important;
-    border: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-    margin-left: 6px !important;
+    display: none !important;
   }
 }
