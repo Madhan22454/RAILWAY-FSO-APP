@@ -460,9 +460,20 @@ function renderFormQuestions() {
 
 function scrollToAnnex(event, annexId) {
   event.preventDefault();
-  const el = document.getElementById(`box-${annexId}`);
+  const targetLink = event.currentTarget;
+  // Look for elements in the closest modal or route view
+  const viewContainer = targetLink.closest('.modal') || targetLink.closest('.view') || document;
+  const el = viewContainer.querySelector(`[id$="${annexId}"]`);
+  
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const scrollParent = targetLink.closest('.modal');
+    if (scrollParent) {
+      // Offset scroll for modal container
+      const topPos = el.offsetTop;
+      scrollParent.scrollTo({ top: topPos - 20, behavior: 'smooth' });
+    } else {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
     el.style.boxShadow = '0 0 15px #3182ce';
     setTimeout(() => {
       el.style.boxShadow = '';

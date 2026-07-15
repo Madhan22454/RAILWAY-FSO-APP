@@ -638,9 +638,10 @@ select option { background: var(--bg-secondary); }
   .btn, #toast-container, .modal-overlay, .no-print { display: none !important; }
   .main-content { margin-left: 0 !important; padding: 0 !important; }
   body { background: white !important; color: black !important; }
-  .report-content { border: none !important; background: white !important; color: black !important; }
-  .report-table th { background: #dbeafe !important; color: #1e40af !important; }
-  .report-table td { color: #374151 !important; }
+  .report-content { border: none !important; background: white !important; color: black !important; overflow: visible !important; }
+  .report-table { border: 2px solid #000000 !important; border-collapse: collapse !important; }
+  .report-table th { background: #f2f2f2 !important; color: black !important; border: 1px solid #000000 !important; font-weight: bold !important; }
+  .report-table td { color: black !important; border: 1px solid #000000 !important; }
 }
 
 /* ── Responsive ── */
